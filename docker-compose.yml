@@ -41,7 +41,7 @@ services:
       - "29092:29092"
 
   debezium:
-    image: debezium/connect:2.7
+    image: debezium/connect:2.7.3.Final
     depends_on:
       postgres:
         condition: service_healthy

@@ -58,7 +58,8 @@ def generate_orders(
 
         for product in items:
             quantity = random.randint(1, 5)
-            item_total = round(quantity * product["price"], 2)
+            unit_price = float(product["price"])
+            item_total = round(quantity * unit_price, 2)
             order_total += item_total
             order_items.append(
                 {
@@ -66,7 +67,7 @@ def generate_orders(
                     "order_id": order_id,
                     "product_id": product["product_id"],
                     "quantity": quantity,
-                    "unit_price": product["price"],
+                    "unit_price": unit_price,
                     "total_price": item_total,
                 }
             )
@@ -242,3 +243,6 @@ def generate_web_events(customers: list[dict[str, Any]], count: int = 5000) -> l
                 }
             )
     return events
+
+def generate_web_event_batch(customers: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return generate_web_events(customers, 1)

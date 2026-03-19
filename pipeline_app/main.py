@@ -1,4 +1,5 @@
 import logging
+from pipeline_app.debezium import ensure_connector_registered, wait_for_connector_running
 from pipeline_app.database import create_source_tables, fetch_rows, insert_batch, table_has_rows, wait_for_database
 from pipeline_app.generator import (
     generate_customers,
@@ -9,6 +10,7 @@ from pipeline_app.generator import (
     generate_products,
     generate_support_tickets,
 )
+from pipeline_app.kafka_producer import publish_web_events_forever
 
 logging.basicConfig(
     level=logging.INFO,
@@ -67,6 +69,9 @@ def main() -> None:
     customers, products = seed_customers_and_products()
     orders = seed_orders_and_dependents(customers, products)
     seed_remaining_sources(customers, orders)
+    ensure_connector_registered()
+    wait_for_connector_running()
+    publish_web_events_forever(customers)
 
 if __name__ == "__main__":
     main()

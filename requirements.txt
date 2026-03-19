@@ -1,3 +1,4 @@
 python-dotenv==1.0.1
 psycopg2-binary==2.9.9
 faker==24.14.1
+kafka-python==2.0.2

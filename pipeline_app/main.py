@@ -11,6 +11,7 @@ from pipeline_app.generator import (
     generate_support_tickets,
 )
 from pipeline_app.kafka_producer import publish_web_events_forever
+from pipeline_app.storage import ensure_bucket_exists
 
 logging.basicConfig(
     level=logging.INFO,
@@ -69,6 +70,7 @@ def main() -> None:
     customers, products = seed_customers_and_products()
     orders = seed_orders_and_dependents(customers, products)
     seed_remaining_sources(customers, orders)
+    ensure_bucket_exists()
     ensure_connector_registered()
     wait_for_connector_running()
     publish_web_events_forever(customers)

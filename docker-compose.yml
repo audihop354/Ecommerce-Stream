@@ -93,6 +93,23 @@ services:
       minio:
         condition: service_started
 
+  spark-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.spark
+    depends_on:
+      kafka:
+        condition: service_started
+      pipeline:
+        condition: service_started
+    env_file:
+      - .env
+    ports:
+      - "4040:4040"
+    volumes:
+      - spark_checkpoints:/tmp/spark-checkpoints
+
 volumes:
   postgres_data:
   minio_data:
+  spark_checkpoints:

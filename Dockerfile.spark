@@ -1,0 +1,16 @@
+FROM apache/spark:3.5.1
+
+USER root
+
+WORKDIR /app
+
+ENV PYTHONPATH=/app
+
+RUN mkdir -p /tmp/ivy && chmod 777 /tmp/ivy
+
+COPY requirements.txt ./requirements.txt
+RUN python3 -m pip install --no-cache-dir -r requirements.txt
+
+COPY pipeline_app ./pipeline_app
+
+CMD ["/opt/spark/bin/spark-submit", "--master", "local[*]", "--conf", "spark.jars.ivy=/tmp/ivy", "--packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262", "/app/pipeline_app/spark_consumer.py"]

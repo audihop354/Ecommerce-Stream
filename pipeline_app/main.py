@@ -1,9 +1,13 @@
 import logging
+import random
+import threading
+import time
 from pipeline_app.debezium import ensure_connector_registered, wait_for_connector_running
 from pipeline_app.database import create_source_tables, fetch_rows, insert_batch, table_has_rows, wait_for_database
 from pipeline_app.generator import (
     generate_customers,
     generate_incidents,
+    generate_live_order_activity,
     generate_marketing_spend,
     generate_orders,
     generate_payments,
@@ -17,6 +21,8 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s - %(message)s",
 )
+
+logger = logging.getLogger(__name__)
 
 def seed_customers_and_products() -> tuple[list[dict], list[dict]]:
     if not table_has_rows("customers"):
@@ -64,6 +70,16 @@ def seed_remaining_sources(customers: list[dict], orders: list[dict]) -> None:
     if not table_has_rows("marketing_spend"):
         insert_batch("marketing_spend", generate_marketing_spend(100))
 
+def publish_order_activity_forever(customers: list[dict], products: list[dict]) -> None:
+    logger.info("starting postgres order activity loop")
+    while True:
+        order, order_items, payment = generate_live_order_activity(customers, products)
+        insert_batch("orders", [order])
+        insert_batch("order_items", order_items)
+        insert_batch("payments", [payment])
+        logger.info("created live order %s and payment %s", order["order_id"], payment["payment_id"])
+        time.sleep(random.randint(15, 20))
+
 def main() -> None:
     wait_for_database()
     create_source_tables()
@@ -73,7 +89,9 @@ def main() -> None:
     ensure_bucket_exists()
     ensure_connector_registered()
     wait_for_connector_running()
-    publish_web_events_forever(customers)
+    web_events_thread = threading.Thread(target=publish_web_events_forever, args=(customers,), daemon=True)
+    web_events_thread.start()
+    publish_order_activity_forever(customers, products)
 
 if __name__ == "__main__":
     main()

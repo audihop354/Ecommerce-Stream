@@ -246,3 +246,11 @@ def generate_web_events(customers: list[dict[str, Any]], count: int = 5000) -> l
 
 def generate_web_event_batch(customers: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return generate_web_events(customers, 1)
+
+def generate_live_order_activity(
+    customers: list[dict[str, Any]], products: list[dict[str, Any]]
+) -> tuple[dict[str, Any], list[dict[str, Any]], dict[str, Any]]:
+    orders, order_items = generate_orders(customers, products, 1)
+    order = orders[0]
+    payment = generate_payments([order], 1)[0]
+    return order, order_items, payment

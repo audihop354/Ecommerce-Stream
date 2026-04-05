@@ -109,6 +109,18 @@ services:
     volumes:
       - spark_checkpoints:/tmp/spark-checkpoints
 
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    env_file:
+      - .env
+    depends_on:
+      minio:
+        condition: service_started
+    ports:
+      - "8501:8501"
+
 volumes:
   postgres_data:
   minio_data:

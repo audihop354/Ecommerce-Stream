@@ -5,8 +5,8 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-COPY requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.pipeline.txt ./requirements.pipeline.txt
+RUN pip install --no-cache-dir -r requirements.pipeline.txt
 
 COPY pipeline_app ./pipeline_app
 

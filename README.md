@@ -2,6 +2,8 @@
 
 An end-to-end **real-time streaming data pipeline** that captures Change Data Capture (CDC) events from a transactional e-commerce database, streams them through Kafka, lands raw data into an S3-compatible data lake via Spark Structured Streaming, and visualises key metrics on a live dashboard.
 
+![Architecture Diagram](./app_SE.png)
+
 ## Tech Stack
 
 | Layer | Technology |
